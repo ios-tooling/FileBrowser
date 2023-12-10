@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "suite",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bengottlieb/Suite.git",
+      "state" : {
+        "revision" : "9f8995f12448c947a4f90efb01f9655334ad9563",
+        "version" : "1.0.101"
+      }
+    }
+  ],
+  "version" : 2
+}
