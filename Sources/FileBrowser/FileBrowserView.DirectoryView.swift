@@ -95,7 +95,7 @@ extension FileBrowserView {
 			}
 			.navigationTitle(url.lastPathComponent)
 			.toolbar {
-				ToolbarItem(placement: .topBarTrailing) {
+				ToolbarItem(placement: .primaryAction) {
 					Button(action: { dismissParent() }) {
 						Image(systemName: "chevron.down")
 					}

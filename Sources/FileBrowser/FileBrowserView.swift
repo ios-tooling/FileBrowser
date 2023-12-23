@@ -30,7 +30,9 @@ public struct FileBrowserView: View {
 						FileDetailsView(url: url)
 					}
 				}
+			#if os(iOS)
 				.navigationBarTitleDisplayMode(.inline)
+			#endif
 		}
 		.environment(\.dismissParent) { presentationMode.wrappedValue.dismiss() }
 
@@ -38,6 +40,7 @@ public struct FileBrowserView: View {
 }
 
 extension FileBrowserView {
+	public static var appBundle: some View { FileBrowserView(root: Bundle.main.bundleURL) }
 	public static var home: some View { FileBrowserView(root: URL.homeDirectory) }
 	public static var root: some View { FileBrowserView(root: URL(fileURLWithPath: "/"), current: .homeDirectory) }
 }
