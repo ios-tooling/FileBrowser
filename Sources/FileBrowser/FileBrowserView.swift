@@ -11,9 +11,11 @@ public struct FileBrowserView: View {
 	private let root: URL
 	@State private var directoryPath = NavigationPath()
 	@Environment(\.presentationMode) var presentationMode
+	let fileBrowersOptions: Option
 
-	public init(root url: URL, current: URL? = nil) {
+	public init(root url: URL, current: URL? = nil, options: Option = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion]) {
 		root = url
+		fileBrowersOptions = options
 		
 		if let current, current.isSubdirectory(of: root), let components = current.componentDirectoryURLs {
 			_directoryPath = State(initialValue: NavigationPath(components))
@@ -35,6 +37,7 @@ public struct FileBrowserView: View {
 			#endif
 		}
 		.environment(\.dismissParent) { presentationMode.wrappedValue.dismiss() }
+		.environment(\.fileBrowserOptions, fileBrowersOptions)
 
 	}
 }
