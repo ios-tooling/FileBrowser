@@ -14,7 +14,7 @@ extension FileBrowserView.FileDetailsView {
 	struct MetadataView: View {
 		let url: URL
 		let resourceValues: [URLResourceKey: Any]
-		let audioDuration: TimeInterval?
+		@State private var audioDuration: TimeInterval?
 
 		@State var player: AVPlayer?
 		@StateObject var pokee = PokeableObject()
@@ -49,7 +49,6 @@ extension FileBrowserView.FileDetailsView {
 			}
 			
 			resourceValues = values
-			audioDuration = url.audioDuration
 		}
 		
 		@ViewBuilder var controls: some View {
@@ -66,7 +65,7 @@ extension FileBrowserView.FileDetailsView {
 		var body: some View {
 			List {
 				controls
-				if let audioDuration = url.audioDuration {
+				if let audioDuration {
 					LabeledMeta(label: "Audio duration", data: audioDuration.durationString(style: .milliseconds, roundUp: false))
 				}
 				ForEach(URLResourceKey.propertiesOfInterest, id: \.rawValue) { key in
@@ -86,6 +85,9 @@ extension FileBrowserView.FileDetailsView {
 				}
 			}
 			.listStyle(.plain)
+			.task {
+				audioDuration = try? await url.audioDuration
+			}
 		}
 	}
 	

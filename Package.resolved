@@ -3,10 +3,10 @@
     {
       "identity" : "suite",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bengottlieb/Suite.git",
+      "location" : "https://github.com/ios-tooling/Suite.git",
       "state" : {
-        "revision" : "9f8995f12448c947a4f90efb01f9655334ad9563",
-        "version" : "1.0.101"
+        "revision" : "2e4aed118a525ed54ee197f7afa76473d06e677b",
+        "version" : "1.0.107"
       }
     }
   ],
