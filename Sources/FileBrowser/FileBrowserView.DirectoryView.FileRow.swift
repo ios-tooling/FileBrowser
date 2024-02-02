@@ -10,7 +10,8 @@ import Suite
 extension FileBrowserView.DirectoryView {
 	struct FileRow: View {
 		let url: URL
-		
+		@Environment(\.fileBrowserOptions) var fileBrowserOptions
+
 		func shareFile() {
 			
 		}
@@ -32,9 +33,11 @@ extension FileBrowserView.DirectoryView {
 							.font(.caption)
 							.opacity(0.66)
 						
-						ShareLink(item: url) {
-							Image(systemName: "square.and.arrow.up")
-								.padding(5)
+						if fileBrowserOptions.contains(.allowFileSharing) {
+							ShareLink(item: url) {
+								Image(systemName: "square.and.arrow.up")
+									.padding(5)
+							}
 						}
 					}
 				}

@@ -41,9 +41,21 @@ extension FileBrowserView {
 		@State var errors: [Error] = []
 		@Environment(\.dismissParent) private var dismissParent
 		@State var items: [DirectoryItem]?
+		@Environment(\.fileBrowserOptions) var fileBrowserOptions
 
 		init(url: URL) {
 			self.url = url
+		}
+		
+		func clearDirectory() {
+			for item in items ?? [] {
+				do {
+					try FileManager.default.removeItem(at: item.url)
+				} catch {
+					errors.append(error)
+				}
+			}
+			withAnimation { items = [] }
 		}
 		
 		var body: some View {
@@ -74,6 +86,7 @@ extension FileBrowserView {
 								}
 								
 							}
+							.deleteDisabled(!fileBrowserOptions.contains(.allowFileDeletion))
 						}
 						.listStyle(.plain)
 					} else {
@@ -98,6 +111,14 @@ extension FileBrowserView {
 				ToolbarItem(placement: .primaryAction) {
 					Button(action: { dismissParent() }) {
 						Image(systemName: "chevron.down")
+					}
+				}
+				
+				if fileBrowserOptions.contains(.showClearDirectoryButton) {
+					ToolbarItem(placement: .automatic) {
+						Button(action: { clearDirectory() }) {
+							Image(systemName: "trash")
+						}
 					}
 				}
 			}

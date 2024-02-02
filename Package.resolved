@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ios-tooling/Suite.git",
       "state" : {
-        "revision" : "2e4aed118a525ed54ee197f7afa76473d06e677b",
-        "version" : "1.0.107"
+        "revision" : "f25a0a0d88e057dba003fad422e02d3c917dd87f",
+        "version" : "1.0.102"
       }
     }
   ],
