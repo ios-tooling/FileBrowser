@@ -54,6 +54,10 @@ extension FileBrowserView {
 						Text(error.localizedDescription)
 							.padding()
 					}
+					Button("OK") {
+						errors = []
+					}
+					.buttonStyle(.bordered)
 				} else {
 					if let items {
 						List {
