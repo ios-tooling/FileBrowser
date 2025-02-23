@@ -18,7 +18,6 @@ extension FileBrowserView.FileDetailsView {
 
 		@State var player: AVPlayer?
 		@StateObject var pokee = PokeableObject()
-		@State private var audioDuration: TimeInterval?
 		
 		func play() {
 			if player == nil { player = AVPlayer(url: url) }
