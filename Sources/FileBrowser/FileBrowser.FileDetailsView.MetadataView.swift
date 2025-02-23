@@ -18,6 +18,7 @@ extension FileBrowserView.FileDetailsView {
 
 		@State var player: AVPlayer?
 		@StateObject var pokee = PokeableObject()
+		@State private var audioDuration: TimeInterval?
 		
 		func play() {
 			if player == nil { player = AVPlayer(url: url) }
@@ -76,6 +77,7 @@ extension FileBrowserView.FileDetailsView {
 							LabeledMeta(label: key.rawValue, data: date.localTimeString())
 						} else if let number = object as? NSNumber, key.rawValue.contains("Size") {
 							LabeledMeta(label: key.rawValue, data: number.int64Value.bytesString)
+							LabeledMeta(label: key.rawValue, data: number.int64Value.formatted() + "b")
 						} else if let desc = object as? CustomStringConvertible {
 							LabeledMeta(label: key.rawValue, data: desc.description)
 						} else {
