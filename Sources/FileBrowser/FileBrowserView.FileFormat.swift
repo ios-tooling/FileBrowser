@@ -17,14 +17,12 @@ public protocol FileBrowserFileFormat: AnyObject {
 	var contentView: AnyView { get }
 }
 
-public extension FileBrowserView {
-	static var formats: [FileBrowserFileFormat.Type] = []
-	
-	static func register(format: FileBrowserFileFormat.Type) {
-		formats.append(format)
-	}
-	
-	static func formatter(for fileExtension: String) -> (any FileBrowserFileFormat.Type)? {
-		formats.first { $0.fileExtension.lowercased() == fileExtension.lowercased() }
-	}
+public var fileBrowserViewFormats: [FileBrowserFileFormat.Type] = []
+
+public func registerFileBrowserView(format: FileBrowserFileFormat.Type) {
+	fileBrowserViewFormats.append(format)
+}
+
+public func fileBrowserViewFormatter(for fileExtension: String) -> (any FileBrowserFileFormat.Type)? {
+	fileBrowserViewFormats.first { $0.fileExtension.lowercased() == fileExtension.lowercased() }
 }

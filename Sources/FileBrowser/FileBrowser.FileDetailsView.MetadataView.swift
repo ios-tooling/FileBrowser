@@ -15,6 +15,7 @@ extension FileBrowserView.FileDetailsView {
 		let url: URL
 		let resourceValues: [URLResourceKey: Any]
 		@State private var audioDuration: TimeInterval?
+		@Environment(\.fileHandlerForFile) var fileHandler
 
 		@State var player: AVPlayer?
 		@StateObject var pokee = PokeableObject()
@@ -65,6 +66,10 @@ extension FileBrowserView.FileDetailsView {
 		var body: some View {
 			List {
 				controls
+				if let view = fileHandler(url, .details) {
+					view
+				}
+				
 				if let audioDuration {
 					LabeledMeta(label: "Audio duration", data: audioDuration.durationString(style: .milliseconds, roundUp: false))
 				}

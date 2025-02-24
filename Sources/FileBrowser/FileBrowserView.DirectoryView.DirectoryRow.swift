@@ -10,10 +10,14 @@ import Suite
 extension FileBrowserView.DirectoryView {
 	struct DirectoryRow: View {
 		let url: URL
-		
+		@Environment(\.fileHandlerForFile) var fileHandler
+
 		var body: some View {
 			NavigationLink(value: url) {
 				HStack {
+					if let view = fileHandler(url, .list) {
+						view
+					}
 					Text(url.lastPathComponent)
 					
 					Spacer()

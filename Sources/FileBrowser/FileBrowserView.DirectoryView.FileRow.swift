@@ -11,6 +11,7 @@ extension FileBrowserView.DirectoryView {
 	struct FileRow: View {
 		let url: URL
 		@Environment(\.fileBrowserOptions) var fileBrowserOptions
+		@Environment(\.fileHandlerForFile) var fileHandler
 
 		func shareFile() {
 			
@@ -20,6 +21,9 @@ extension FileBrowserView.DirectoryView {
 			ZStack {
 				NavigationLink(value: url) { EmptyView() }.opacity(0)
 				HStack {
+					if let view = fileHandler(url, .list) {
+						view
+					}
 					Text(url.lastPathComponent)
 					
 					Spacer()

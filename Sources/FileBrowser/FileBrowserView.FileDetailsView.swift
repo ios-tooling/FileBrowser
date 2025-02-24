@@ -29,7 +29,7 @@ extension FileBrowserView {
 						.tabItem { Label("Data", systemImage: "doc.text.magnifyingglass") }
 						.tag(Tab.content)
 					
-					if let formatter = FileBrowserView.formatter(for: url.pathExtension), let formatDetails {
+					if let formatter = fileBrowserViewFormatter(for: url.pathExtension), let formatDetails {
 						formatDetails.contentView
 							.tabItem { Label(formatter.name, systemImage: "eye") }
 							.tag(Tab.content)
@@ -38,7 +38,7 @@ extension FileBrowserView {
 			}
 			.navigationTitle(url.lastPathComponent)
 			.onAppear {
-				if let formatter = FileBrowserView.formatter(for: url.pathExtension) {
+				if let formatter = fileBrowserViewFormatter(for: url.pathExtension) {
 					do {
 						formatDetails = try formatter.init(url: url)
 					} catch {
