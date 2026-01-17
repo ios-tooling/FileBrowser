@@ -9,7 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import Suite
 
-extension FileBrowserView.FileDetailsView {
+extension FileBrowserScreen.FileDetailsView {
 	struct DataView: View {
 		let data: Data
 		let url: URL

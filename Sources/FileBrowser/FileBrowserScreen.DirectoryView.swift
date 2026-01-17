@@ -1,5 +1,5 @@
 //
-//  FileBrowserView.DirectoryView.swift
+//  FileBrowserScreen.DirectoryView.swift
 //
 //  Created by Ben Gottlieb on 9/3/23.
 //
@@ -35,7 +35,7 @@ struct DirectoryItem: Comparable, Identifiable, Hashable {
 	}
 }
 
-extension FileBrowserView {
+extension FileBrowserScreen {
 	@MainActor struct DirectoryView: View {
 		let url: URL
 		@State var errors: [Error] = []

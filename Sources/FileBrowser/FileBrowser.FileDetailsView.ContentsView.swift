@@ -16,7 +16,7 @@ extension UTType {
 	}
 }
 
-extension FileBrowserView.FileDetailsView {
+extension FileBrowserScreen.FileDetailsView {
 	struct ContentsView: View {
 		let url: URL
 		let fileType: UTType

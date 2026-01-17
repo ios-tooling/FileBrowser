@@ -1,12 +1,12 @@
 //
-//  FileBrowserView.FileDetailsView.swift
+//  FileBrowserScreen.FileDetailsView.swift
 //
 //  Created by Ben Gottlieb on 9/3/23.
 //
 
 import SwiftUI
 
-extension FileBrowserView {
+extension FileBrowserScreen {
 	struct FileDetailsView: View {
 		let url: URL
 		enum Tab: String { case metadata, content }

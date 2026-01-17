@@ -8,6 +8,7 @@
 import SwiftUI
 import AVKit
 
+#if canImport(UIKit)
 struct MovieViewer: UIViewControllerRepresentable {
 	let url: URL
 	
@@ -41,3 +42,4 @@ struct MovieViewer: UIViewControllerRepresentable {
 		}
 	}
 }
+#endif

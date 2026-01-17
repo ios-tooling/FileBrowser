@@ -1,5 +1,5 @@
 //
-//  FileBrowserView.DirectoryView.DirectoryRow.swift
+//  FileBrowserScreen.DirectoryView.DirectoryRow.swift
 //
 //  Created by Ben Gottlieb on 9/3/23.
 //
@@ -7,7 +7,7 @@
 import SwiftUI
 import Suite
 
-extension FileBrowserView.DirectoryView {
+extension FileBrowserScreen.DirectoryView {
 	struct DirectoryRow: View {
 		let url: URL
 		@Environment(\.fileHandlerForFile) var fileHandler

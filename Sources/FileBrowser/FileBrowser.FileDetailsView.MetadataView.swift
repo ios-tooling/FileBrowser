@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 import Suite
 import AVFoundation
 
-extension FileBrowserView.FileDetailsView {
+extension FileBrowserScreen.FileDetailsView {
 	struct MetadataView: View {
 		let url: URL
 		let resourceValues: [URLResourceKey: Any]

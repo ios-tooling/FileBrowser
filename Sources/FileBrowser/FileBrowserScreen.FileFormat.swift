@@ -1,5 +1,5 @@
 //
-//  FileBrowserView.FileFormat.swift
+//  FileBrowserScreen.FileFormat.swift
 //  Internal
 //
 //  Created by Ben Gottlieb on 9/11/23.
