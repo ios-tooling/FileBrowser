@@ -24,7 +24,7 @@ public struct FileBrowserDirectory: Identifiable, Equatable, Hashable, Sendable 
 
 // Convenience extension for URL conversion
 public extension URL {
-	var asDirectory: FileBrowserDirectory {
+	var fileDirectory: FileBrowserDirectory {
 		FileBrowserDirectory(url: self)
 	}
 }

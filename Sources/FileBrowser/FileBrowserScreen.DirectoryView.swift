@@ -52,14 +52,37 @@ extension FileBrowserScreen {
 		}
 		
 		func clearDirectory() {
+			var deletionErrors: [Error] = []
+
 			for item in items ?? [] {
 				do {
 					try FileManager.default.removeItem(at: item.directory.url)
 				} catch {
-					errors.append(error)
+					deletionErrors.append(error)
 				}
 			}
-			withAnimation { items = [] }
+
+			// Reload directory to reflect actual filesystem state
+			Task {
+				do {
+					let urls = try FileManager.default.contentsOfDirectory(at: directory.url, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest)
+					let loadedItems = urls.map { DirectoryItem(directory: FileBrowserDirectory(url: $0)) }.sorted()
+
+					await MainActor.run {
+						withAnimation {
+							self.items = loadedItems
+						}
+						// Show errors if any deletions failed
+						if !deletionErrors.isEmpty {
+							self.errors = deletionErrors
+						}
+					}
+				} catch {
+					await MainActor.run {
+						self.errors = [error]
+					}
+				}
+			}
 		}
 		
 		var body: some View {
@@ -84,15 +107,38 @@ extension FileBrowserScreen {
 									DirectoryRow(directory: item.directory)
 								}
 							}
-							.onDelete { indexSet in
+								.onDelete { indexSet in
+								var deletionErrors: [Error] = []
+
 								items[indexSet].forEach { item in
 									do {
 										try FileManager.default.removeItem(at: item.directory.url)
 									} catch {
-										errors.append(error)
+										deletionErrors.append(error)
 									}
 								}
 
+								// Reload directory to reflect actual filesystem state
+								Task {
+									do {
+										let urls = try FileManager.default.contentsOfDirectory(at: directory.url, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest)
+										let loadedItems = urls.map { DirectoryItem(directory: FileBrowserDirectory(url: $0)) }.sorted()
+
+										await MainActor.run {
+											withAnimation {
+												self.items = loadedItems
+											}
+											// Show errors if any deletions failed
+											if !deletionErrors.isEmpty {
+												self.errors = deletionErrors
+											}
+										}
+									} catch {
+										await MainActor.run {
+											self.errors = [error]
+										}
+									}
+								}
 							}
 							.deleteDisabled(!fileBrowserOptions.contains(.allowFileDeletion))
 						}
