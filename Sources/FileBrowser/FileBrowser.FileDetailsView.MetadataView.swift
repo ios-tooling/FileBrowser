@@ -66,7 +66,7 @@ extension FileBrowserScreen.FileDetailsView {
 		var body: some View {
 			List {
 				controls
-				if let view = fileHandler(url, .details) {
+				if let view = fileHandler(FileBrowserDirectory(url: url), .details) {
 					view
 				}
 				

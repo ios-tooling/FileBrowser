@@ -9,18 +9,18 @@ import Suite
 import UniformTypeIdentifiers
 
 struct ViewFileButton: View {
-	let url: any FileBrowserDirectory
+	let directory: FileBrowserDirectory
 	@Environment(\.fileBrowserOptions) var fileBrowserOptions
 	@State private var isViewing = false
-	
+
 	var body: some View {
-		if fileBrowserOptions.contains(.allowFileViewing), url.directoryURL.fileType?.isViewable == true {
+		if fileBrowserOptions.contains(.allowFileViewing), directory.url.fileType?.isViewable == true {
 			Button(action: { isViewing.toggle() }) {
 				Image(systemName: "eye")
 					.padding(5)
 			}
 			.sheet(isPresented: $isViewing) {
-				FileContentsView(url: url.directoryURL)
+				FileContentsView(url: directory.url)
 					.frame(minWidth: 400, minHeight: 400)
 			}
 		}

@@ -8,53 +8,53 @@ import SwiftUI
 import Suite
 
 struct DirectoryItem: Comparable, Identifiable, Hashable {
-	let url: any FileBrowserDirectory
+	let directory: FileBrowserDirectory
 	let filename: String
-	var id: URL { url.directoryURL }
-	
+	var id: URL { directory.url }
+
 	func hash(into hasher: inout Hasher) {
-		url.hash(into: &hasher)
+		directory.hash(into: &hasher)
 	}
-	
-	var isFile: Bool { url.directoryURL.isFile }
-	
-	init(url: URL) {
-		self.url = url
-		self.filename = url.directoryURL.lastPathComponent.lowercased()
+
+	var isFile: Bool { directory.isFile }
+
+	init(directory: FileBrowserDirectory) {
+		self.directory = directory
+		self.filename = directory.url.lastPathComponent.lowercased()
 	}
-	
+
 	static func <(lhs: Self, rhs: Self) -> Bool {
 		if lhs.filename.hasPrefix(".") {
 			if !rhs.filename.hasPrefix(".") { return false }
 		} else if rhs.filename.hasPrefix(".") {
 			return true
 		}
-		
+
 		return lhs.filename < rhs.filename
 	}
-	
+
 	static func ==(lhs: Self, rhs: Self) -> Bool {
-		lhs.url == rhs.url
+		lhs.directory == rhs.directory
 	}
 }
 
 extension FileBrowserScreen {
 	@MainActor struct DirectoryView: View {
-		let url: any FileBrowserDirectory
+		let directory: FileBrowserDirectory
 		@State var errors: [Error] = []
 		@Environment(\.dismissParent) private var dismissParent
 		@State var items: [DirectoryItem]?
 		@Environment(\.fileBrowserOptions) var fileBrowserOptions
 		@State var isLoading = true
 
-		init(url: any FileBrowserDirectory) {
-			self.url = url
+		init(directory: FileBrowserDirectory) {
+			self.directory = directory
 		}
 		
 		func clearDirectory() {
 			for item in items ?? [] {
 				do {
-					try FileManager.default.removeItem(at: item.url.directoryURL)
+					try FileManager.default.removeItem(at: item.directory.url)
 				} catch {
 					errors.append(error)
 				}
@@ -79,20 +79,20 @@ extension FileBrowserScreen {
 						List {
 							ForEach(items, id: \.self) { item in
 								if item.isFile {
-									FileRow(url: item.url)
+									FileRow(directory: item.directory)
 								} else {
-									DirectoryRow(url: item.url)
+									DirectoryRow(directory: item.directory)
 								}
 							}
 							.onDelete { indexSet in
 								items[indexSet].forEach { item in
 									do {
-										try FileManager.default.removeItem(at: item.url.directoryURL)
+										try FileManager.default.removeItem(at: item.directory.url)
 									} catch {
 										errors.append(error)
 									}
 								}
-								
+
 							}
 							.deleteDisabled(!fileBrowserOptions.contains(.allowFileDeletion))
 						}
@@ -101,7 +101,7 @@ extension FileBrowserScreen {
 						Text("Loading…")
 							.opacity(0.5)
 					} else {
-						if #available(macOS 14.0, *) {
+						if #available(iOS 17, macOS 14.0, *) {
 							ContentUnavailableView {
 								Image(systemName: "folder")
 								Text("Empty Directory")
@@ -116,19 +116,25 @@ extension FileBrowserScreen {
 				}
 				Spacer(minLength: 0)
 			}
-			.task(id: url.directoryURL) {
-				Task.detached {
+			.task(id: directory.url) {
+				Task {
 					do {
-						let items = try FileManager.default.contentsOfDirectory(at: url.directoryURL, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest).map { DirectoryItem(url: $0) }.sorted()
-						
-						await MainActor.run { self.items = items }
+						let urls = try FileManager.default.contentsOfDirectory(at: directory.url, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest)
+						let items = urls.map { DirectoryItem(directory: FileBrowserDirectory(url: $0)) }.sorted()
+
+						await MainActor.run {
+							self.items = items
+							self.isLoading = false
+						}
 					} catch {
-						await MainActor.run { errors = [error] } 
+						await MainActor.run {
+							self.errors = [error]
+							self.isLoading = false
+						}
 					}
-					await MainActor.run { isLoading = false }
 				}
 			}
-			.navigationTitle(url.directoryURL.lastPathComponent)
+			.navigationTitle(directory.url.lastPathComponent)
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button(action: { dismissParent() }) {

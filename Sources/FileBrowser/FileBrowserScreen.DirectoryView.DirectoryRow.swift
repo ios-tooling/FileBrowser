@@ -9,34 +9,34 @@ import Suite
 
 extension FileBrowserScreen.DirectoryView {
 	struct DirectoryRow: View {
-		let url: any FileBrowserDirectory
+		let directory: FileBrowserDirectory
 		@Environment(\.fileHandlerForFile) var fileHandler
 
 		var body: some View {
-			NavigationLink(value: url) {
+			NavigationLink(value: directory.url) {
 				HStack {
 					Image(systemName: "folder")
 						.imageScale(.small)
 						.opacity(0.5)
-					
-					if let view = fileHandler(url, .list) {
+
+					if let view = fileHandler(directory, .list) {
 						view
 					}
-					Text(url.filename)
-					
+					Text(directory.filename)
+
 					Spacer()
-					
-					if url.isFile {
-						let size = url.directoryURL.fileSize
-						
+
+					if directory.isFile {
+						let size = directory.url.fileSize
+
 						Spacer()
-						
+
 						Text(size.bytesString)
 							.font(.caption)
 							.opacity(0.66)
 					}
-					
-					ShareFileButton(url: url)
+
+					ShareFileButton(directory: directory)
 						.frame(width: 1)
 						.opacity(0)
 				}

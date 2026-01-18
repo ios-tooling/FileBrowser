@@ -8,15 +8,15 @@
 import Suite
 
 struct DirectoryTabs: View {
-	let tabs: [any FileBrowserDirectory]
-	@Binding var root: any FileBrowserDirectory
-	
+	let tabs: [FileBrowserDirectory]
+	@Binding var root: FileBrowserDirectory
+
 	var body: some View {
 		HStack {
 			ForEach(tabs, id: \.id) { tab in
 				let isSelected = tab == root
-				Button(action: { root = tab.directoryURL }) {
-					Text(tab.directoryTitle)
+				Button(action: { root = tab }) {
+					Text(tab.title)
 						.overlay(alignment: .bottom) {
 							if isSelected {
 								Rectangle()
@@ -36,7 +36,7 @@ struct DirectoryTabs: View {
 				}
 			}
 			.buttonStyle(.plain)
-			
+
 			Spacer()
 		}
 		.padding(.horizontal)
