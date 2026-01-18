@@ -9,7 +9,7 @@ import Suite
 
 extension FileBrowserScreen.DirectoryView {
 	struct DirectoryRow: View {
-		let url: URL
+		let url: FileBrowserDirectory
 		@Environment(\.fileHandlerForFile) var fileHandler
 
 		var body: some View {

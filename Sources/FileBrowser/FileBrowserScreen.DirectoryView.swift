@@ -59,7 +59,7 @@ extension FileBrowserScreen {
 		}
 		
 		var body: some View {
-			VStack {
+			VStack(spacing: 0) {
 				if errors.isNotEmpty {
 					ForEach(errors.indices, id: \.self) { idx in
 						let error = errors[idx]
@@ -98,8 +98,9 @@ extension FileBrowserScreen {
 							.opacity(0.5)
 					}
 				}
+				Spacer(minLength: 0)
 			}
-			.task {
+			.task(id: url) {
 				Task.detached {
 					do {
 						let items = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest).map { DirectoryItem(url: $0) }.sorted()
