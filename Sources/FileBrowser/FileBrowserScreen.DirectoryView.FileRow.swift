@@ -9,7 +9,7 @@ import Suite
 
 extension FileBrowserScreen.DirectoryView {
 	struct FileRow: View {
-		let url: URL
+		let url: any FileBrowserDirectory
 		@Environment(\.fileBrowserOptions) var fileBrowserOptions
 		@Environment(\.fileHandlerForFile) var fileHandler
 
@@ -21,15 +21,19 @@ extension FileBrowserScreen.DirectoryView {
 			ZStack {
 				NavigationLink(value: url) { EmptyView() }.opacity(0)
 				HStack {
+					Image(systemName: "folder")
+						.imageScale(.small)
+						.opacity(0.0)
+					
 					if let view = fileHandler(url, .list) {
 						view
 					}
-					Text(url.lastPathComponent)
+					Text(url.filename)
 					
 					Spacer()
 					
 					if url.isFile {
-						let size = url.fileSize
+						let size = url.directoryURL.fileSize
 						
 						Spacer()
 						
@@ -37,12 +41,7 @@ extension FileBrowserScreen.DirectoryView {
 							.font(.caption)
 							.opacity(0.66)
 						
-						if fileBrowserOptions.contains(.allowFileSharing) {
-							ShareLink(item: url) {
-								Image(systemName: "square.and.arrow.up")
-									.padding(5)
-							}
-						}
+						ShareFileButton(url: url)
 					}
 				}
 				.buttonStyle(.plain)

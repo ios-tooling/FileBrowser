@@ -7,13 +7,17 @@
 
 import Suite
 
-public protocol FileBrowserDirectory: Identifiable, Equatable {
+public protocol FileBrowserDirectory: Identifiable, Equatable, Hashable, Sendable {
 	var directoryURL: URL { get }
 	var directoryTitle: String { get }
 }
 
 public extension FileBrowserDirectory {
 	var id: URL { directoryURL }
+	var filename: String { directoryURL.lastPathComponent }
+	
+	var isFile: Bool { directoryURL.isFile }
+	var isDirectory: Bool { directoryURL.isDirectory }
 }
 
 extension URL: FileBrowserDirectory {
@@ -21,7 +25,7 @@ extension URL: FileBrowserDirectory {
 	public var directoryTitle: String { deletingPathExtension().lastPathComponent }
 }
 
-public struct TitledURL: FileBrowserDirectory {
+public struct TitledURL: FileBrowserDirectory, Hashable, Sendable {
 	public var directoryURL: URL
 	public var directoryTitle: String
 	

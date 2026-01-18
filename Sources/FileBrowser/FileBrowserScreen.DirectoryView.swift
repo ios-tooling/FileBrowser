@@ -8,19 +8,19 @@ import SwiftUI
 import Suite
 
 struct DirectoryItem: Comparable, Identifiable, Hashable {
-	let url: URL
+	let url: any FileBrowserDirectory
 	let filename: String
-	var id: URL { url }
+	var id: URL { url.directoryURL }
 	
 	func hash(into hasher: inout Hasher) {
 		url.hash(into: &hasher)
 	}
 	
-	var isFile: Bool { url.isFile }
+	var isFile: Bool { url.directoryURL.isFile }
 	
 	init(url: URL) {
 		self.url = url
-		self.filename = url.lastPathComponent.lowercased()
+		self.filename = url.directoryURL.lastPathComponent.lowercased()
 	}
 	
 	static func <(lhs: Self, rhs: Self) -> Bool {
@@ -31,26 +31,30 @@ struct DirectoryItem: Comparable, Identifiable, Hashable {
 		}
 		
 		return lhs.filename < rhs.filename
-
+	}
+	
+	static func ==(lhs: Self, rhs: Self) -> Bool {
+		lhs.url == rhs.url
 	}
 }
 
 extension FileBrowserScreen {
 	@MainActor struct DirectoryView: View {
-		let url: URL
+		let url: any FileBrowserDirectory
 		@State var errors: [Error] = []
 		@Environment(\.dismissParent) private var dismissParent
 		@State var items: [DirectoryItem]?
 		@Environment(\.fileBrowserOptions) var fileBrowserOptions
+		@State var isLoading = true
 
-		init(url: URL) {
+		init(url: any FileBrowserDirectory) {
 			self.url = url
 		}
 		
 		func clearDirectory() {
 			for item in items ?? [] {
 				do {
-					try FileManager.default.removeItem(at: item.url)
+					try FileManager.default.removeItem(at: item.url.directoryURL)
 				} catch {
 					errors.append(error)
 				}
@@ -83,7 +87,7 @@ extension FileBrowserScreen {
 							.onDelete { indexSet in
 								items[indexSet].forEach { item in
 									do {
-										try FileManager.default.removeItem(at: item.url)
+										try FileManager.default.removeItem(at: item.url.directoryURL)
 									} catch {
 										errors.append(error)
 									}
@@ -93,25 +97,38 @@ extension FileBrowserScreen {
 							.deleteDisabled(!fileBrowserOptions.contains(.allowFileDeletion))
 						}
 						.listStyle(.plain)
-					} else {
+					} else if isLoading {
 						Text("Loading…")
 							.opacity(0.5)
+					} else {
+						if #available(macOS 14.0, *) {
+							ContentUnavailableView {
+								Image(systemName: "folder")
+								Text("Empty Directory")
+							}
+							.frame(maxHeight: .infinity)
+						} else {
+							Text("Empty Directory")
+								.font(.title)
+								.frame(maxHeight: .infinity)
+						}
 					}
 				}
 				Spacer(minLength: 0)
 			}
-			.task(id: url) {
+			.task(id: url.directoryURL) {
 				Task.detached {
 					do {
-						let items = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest).map { DirectoryItem(url: $0) }.sorted()
+						let items = try FileManager.default.contentsOfDirectory(at: url.directoryURL, includingPropertiesForKeys: URLResourceKey.propertiesOfInterest).map { DirectoryItem(url: $0) }.sorted()
 						
 						await MainActor.run { self.items = items }
 					} catch {
 						await MainActor.run { errors = [error] } 
 					}
+					await MainActor.run { isLoading = false }
 				}
 			}
-			.navigationTitle(url.lastPathComponent)
+			.navigationTitle(url.directoryURL.lastPathComponent)
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button(action: { dismissParent() }) {

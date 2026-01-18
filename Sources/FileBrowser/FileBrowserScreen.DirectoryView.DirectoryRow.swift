@@ -9,21 +9,25 @@ import Suite
 
 extension FileBrowserScreen.DirectoryView {
 	struct DirectoryRow: View {
-		let url: FileBrowserDirectory
+		let url: any FileBrowserDirectory
 		@Environment(\.fileHandlerForFile) var fileHandler
 
 		var body: some View {
 			NavigationLink(value: url) {
 				HStack {
+					Image(systemName: "folder")
+						.imageScale(.small)
+						.opacity(0.5)
+					
 					if let view = fileHandler(url, .list) {
 						view
 					}
-					Text(url.lastPathComponent)
+					Text(url.filename)
 					
 					Spacer()
 					
 					if url.isFile {
-						let size = url.fileSize
+						let size = url.directoryURL.fileSize
 						
 						Spacer()
 						
@@ -31,6 +35,10 @@ extension FileBrowserScreen.DirectoryView {
 							.font(.caption)
 							.opacity(0.66)
 					}
+					
+					ShareFileButton(url: url)
+						.frame(width: 1)
+						.opacity(0)
 				}
 				.contentShape(Rectangle())
 			}
