@@ -42,6 +42,7 @@ extension FileBrowserScreen.DirectoryView {
 							.opacity(0.66)
 						
 						ShareFileButton(url: url)
+						ViewFileButton(url: url)
 					}
 				}
 				.buttonStyle(.plain)

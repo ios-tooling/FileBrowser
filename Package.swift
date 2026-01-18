@@ -18,13 +18,15 @@ let package = Package(
     ],
     dependencies: [
 		.package(url: "https://github.com/ios-tooling/Suite.git", from: "1.3.0"),
+		.package(url: "https://github.com/ios-tooling/CrossPlatformKit.git", from: "1.0.13"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "FileBrowser", dependencies: [
-                .product(name: "Suite", package: "Suite"),
+					.product(name: "Suite", package: "Suite"),
+					.product(name: "CrossPlatformKit", package: "CrossPlatformKit"),
             ]),
         .testTarget(
             name: "FileBrowserTests",

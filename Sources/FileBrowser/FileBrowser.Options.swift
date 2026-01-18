@@ -29,5 +29,6 @@ public struct FileBrowserViewOption: RawRepresentable, OptionSet {
 	public static let allowFileSharing = FileBrowserViewOption(rawValue: 1 << 1)
 	public static let showClearDirectoryButton = FileBrowserViewOption(rawValue: 1 << 2)
 	public static let showHiddenFiles = FileBrowserViewOption(rawValue: 1 << 3)
-	
+	public static let allowFileViewing = FileBrowserViewOption(rawValue: 1 << 4)
+
 }

@@ -27,7 +27,7 @@ public struct FileBrowserScreen<FileHandlerView: View>: View {
 	let fileBrowersOptions: FileBrowserViewOption
 	@ViewBuilder var fileHandlerForFile: (any FileBrowserDirectory, FileBrowserButtonPlacement) -> FileHandlerView
 
-	public init(root url: any FileBrowserDirectory, current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion], @ViewBuilder fileHandler: @escaping (any FileBrowserDirectory, FileBrowserButtonPlacement) -> FileHandlerView) {
+	public init(root url: any FileBrowserDirectory, current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion, .allowFileViewing], @ViewBuilder fileHandler: @escaping (any FileBrowserDirectory, FileBrowserButtonPlacement) -> FileHandlerView) {
 		roots = [url]
 		_root = State(initialValue: url.directoryURL)
 		fileBrowersOptions = options
@@ -38,7 +38,7 @@ public struct FileBrowserScreen<FileHandlerView: View>: View {
 		}
 	}
 	
-	public init(root urls: [any FileBrowserDirectory], current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion], @ViewBuilder fileHandler: @escaping (any FileBrowserDirectory, FileBrowserButtonPlacement) -> FileHandlerView) {
+	public init(root urls: [any FileBrowserDirectory], current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion, .allowFileViewing], @ViewBuilder fileHandler: @escaping (any FileBrowserDirectory, FileBrowserButtonPlacement) -> FileHandlerView) {
 		let actual = urls.isEmpty ? [URL.homeDirectory] : urls
 		roots = actual
 		_root = State(initialValue: actual[0].directoryURL)
@@ -78,12 +78,12 @@ public struct FileBrowserScreen<FileHandlerView: View>: View {
 }
 
 extension FileBrowserScreen where FileHandlerView == EmptyView {
-	public init(root url: any FileBrowserDirectory, current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion]) {
+	public init(root url: any FileBrowserDirectory, current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion, .allowFileViewing]) {
 		
 		self.init(root: url, current: current, options: options) { _, _ in EmptyView() }
 	}
 	
-	public init(root urls: [any FileBrowserDirectory], current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion]) {
+	public init(root urls: [any FileBrowserDirectory], current: URL? = nil, options: FileBrowserViewOption = [.showHiddenFiles, .allowFileSharing, .allowFileDeletion, .allowFileViewing]) {
 		
 		self.init(root: urls, current: current, options: options) { _, _ in EmptyView() }
 	}

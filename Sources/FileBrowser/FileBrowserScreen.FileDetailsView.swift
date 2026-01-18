@@ -21,7 +21,7 @@ extension FileBrowserScreen {
 						.tabItem { Label("Metadata", systemImage: "list.clipboard") }
 						.tag(Tab.metadata)
 					
-					ContentsView(url: url)
+					FileContentsView(url: url)
 						.tabItem { Label("Contents", systemImage: "doc") }
 						.tag(Tab.content)
 
