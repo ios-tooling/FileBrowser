@@ -24,61 +24,122 @@ extension UTType {
 struct FileContentsView: View {
 	let url: URL
 	let fileType: UTType
-	@State var image: UXImage?
-	@State var player: AVPlayer?
-	
+	@State private var image: UXImage?
+	@State private var player: AVPlayer?
+	@State private var textContent: String?
+	@State private var isLoading = true
+	@State private var loadError: Error?
+
 	init(url: URL) {
 		self.url = url
-		fileType = url.fileType ?? .data
-		
-		if fileType.isMovie {
-			_player = State(initialValue: AVPlayer(url: url))
-		} else if fileType.isImage {
-			_image = State(initialValue: UXImage(contentsOf: url))
-		}
+		self.fileType = url.fileType ?? .data
 	}
 	
 	var body: some View {
-		if fileType.isMovie, let player {
-			VideoPlayer(player: player)
-				.onAppear {
-					player.play()
+		Group {
+			if let loadError {
+				VStack(spacing: 16) {
+					Image(systemName: "exclamationmark.triangle")
+						.font(.largeTitle)
+						.foregroundColor(.red)
+					Text("Failed to load file")
+						.font(.headline)
+					Text(loadError.localizedDescription)
+						.font(.caption)
+						.foregroundColor(.secondary)
 				}
-				.onDisappear {
-					player.pause()
+				.padding()
+			} else if isLoading {
+				VStack(spacing: 16) {
+					ProgressView()
+					Text("Loading...")
+						.foregroundColor(.secondary)
 				}
-		} else if let image {
-			Image(uxImage: image)
-				.resizable()
-				.aspectRatio(contentMode: .fit)
-		} else {
-			ScrollView {
-				VStack {
-					switch fileType {
-					case .json:
-						Text((try? Data(contentsOf: url).prettyPrintedJSON) ?? "Unable to display")
-						
-					case .text, .xml, .xmlPropertyList:
-						Text((try? String(contentsOf: url)) ?? "Unable to display")
-						
-					default:
-						Text("\(fileType.description)")
-						
-						Text(url.displayed?.prettyPrinted ?? "Unable to display")
+			} else if fileType.isMovie, let player {
+				VideoPlayer(player: player)
+					.onDisappear {
+						player.pause()
 					}
+			} else if fileType.isImage, let image {
+				Image(uxImage: image)
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+			} else if let textContent {
+				ScrollView {
+					Text(textContent)
+						.multilineTextAlignment(.leading)
+						.font(.system(size: 14).monospaced())
+						.padding()
 				}
-				.multilineTextAlignment(.leading)
-				.font(.system(size: 14).monospaced())
+			} else {
+				Text("Unable to display file")
+					.foregroundColor(.secondary)
 			}
 		}
+		.task {
+			await loadContent()
+		}
 	}
-}
 
+	private func loadContent() async {
+		isLoading = true
+		loadError = nil
 
-fileprivate extension URL {
-	var displayed: JSONDictionary? {
-		guard let data = try? Data(contentsOf: self) else { return nil }
-		let json = data.jsonDictionary ?? data.propertyList?.jsonDictionary
-		return json
+		do {
+			if fileType.isMovie {
+				// AVPlayer streams from URL, no need to load
+				await MainActor.run {
+					self.player = AVPlayer(url: url)
+					self.isLoading = false
+				}
+			} else if fileType.isImage {
+				// Load image asynchronously
+				// Note: UXImage (NSImage/UIImage) isn't Sendable in macOS 13, but we're
+				// not sharing it across actors - just loading on background and using on main
+				
+				if #available(macOS 14, *) {
+					let loadedImage: UXImage? = await Task.detached {
+						UXImage(contentsOf: url)
+					}.value
+					
+					guard let loadedImage else {
+						throw URLError(.cannotDecodeContentData)
+					}
+					
+					await MainActor.run {
+						self.image = loadedImage
+						self.isLoading = false
+					}
+				}
+			} else {
+				// Load text content asynchronously
+				let content = try await Task.detached {
+					let data = try Data(contentsOf: url)
+
+					switch fileType {
+					case .json:
+						return data.prettyPrintedJSON ?? "Unable to parse JSON"
+					case .text, .xml, .xmlPropertyList:
+						return String(data: data, encoding: .utf8) ?? "Unable to decode text"
+					default:
+						// Try JSON/plist parsing
+						if let json = data.jsonDictionary ?? data.propertyList?.jsonDictionary {
+							return json.prettyPrinted
+						}
+						return "\(fileType.description)\n\nBinary file (\(data.count) bytes)"
+					}
+				}.value
+
+				await MainActor.run {
+					self.textContent = content
+					self.isLoading = false
+				}
+			}
+		} catch {
+			await MainActor.run {
+				self.loadError = error
+				self.isLoading = false
+			}
+		}
 	}
 }

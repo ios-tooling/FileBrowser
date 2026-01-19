@@ -67,7 +67,7 @@ public struct FileBrowserScreen<FileHandlerView: View>: View {
 					#endif
 			}
 		}
-		.frame(minWidth: 300, minHeight: 500)
+		.frame(minWidth: Gestalt.isOnMac ? 600 : 300, minHeight: 500)
 		.environment(\.dismissParent) { presentationMode.wrappedValue.dismiss() }
 		.environment(\.fileBrowserOptions, fileBrowersOptions)
 		.environment(\.fileHandlerForFile) { directory, placement in

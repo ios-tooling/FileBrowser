@@ -9,6 +9,76 @@ import SwiftUI
 import UniformTypeIdentifiers
 import Suite
 import AVFoundation
+import Combine
+
+// AudioPlayerController manages AVPlayer lifecycle properly
+@MainActor
+class AudioPlayerController: ObservableObject {
+	@Published var isPlaying = false
+	private var player: AVPlayer?
+	private var timeObserver: Any?
+	private var statusObservation: AnyCancellable?
+	private let url: URL
+
+	init(url: URL) {
+		self.url = url
+	}
+
+	func togglePlayback() {
+		// Lazy initialize player
+		if player == nil {
+			player = AVPlayer(url: url)
+			setupObservers()
+		}
+
+		guard let player else { return }
+
+		if isPlaying {
+			player.pause()
+			isPlaying = false
+		} else {
+			player.play()
+			isPlaying = true
+		}
+	}
+
+	private func setupObservers() {
+		guard let player else { return }
+
+		// Observe playback status
+		statusObservation = player.publisher(for: \.timeControlStatus)
+			.sink { [weak self] status in
+				Task { @MainActor in
+					self?.isPlaying = (status == .playing)
+				}
+			}
+	}
+
+	func cleanup() {
+		player?.pause()
+		isPlaying = false
+
+		// Remove time observer if exists
+		if let timeObserver, let player {
+			player.removeTimeObserver(timeObserver)
+			self.timeObserver = nil
+		}
+
+		// Cancel status observation
+		statusObservation?.cancel()
+		statusObservation = nil
+
+		// Release player
+		player = nil
+	}
+
+	deinit {
+		// Clean up non-isolated resources
+		// Player will be deallocated when controller is deallocated
+		// Cancellable will cancel on dealloc
+		statusObservation?.cancel()
+	}
+}
 
 extension FileBrowserScreen.FileDetailsView {
 	struct MetadataView: View {
@@ -16,26 +86,14 @@ extension FileBrowserScreen.FileDetailsView {
 		let resourceValues: [URLResourceKey: Any]
 		@State private var audioDuration: TimeInterval?
 		@Environment(\.fileHandlerForFile) var fileHandler
-
-		@State var player: AVPlayer?
-		@StateObject var pokee = PokeableObject()
-		
-		func play() {
-			if player == nil { player = AVPlayer(url: url) }
-			
-			if player?.isPlaying == true {
-				player?.pause()
-			} else {
-				player?.play()
-			}
-			pokee.poke()
-		}
+		@StateObject private var audioPlayer: AudioPlayerController
 		
 		init(url: URL) {
 			self.url = url
-			
+			_audioPlayer = StateObject(wrappedValue: AudioPlayerController(url: url))
+
 			var values: [URLResourceKey: Any] = [:]
-			
+
 			let nsURL = url as NSURL
 			for key in URLResourceKey.propertiesOfInterest {
 				var object: AnyObject?
@@ -48,14 +106,14 @@ extension FileBrowserScreen.FileDetailsView {
 					print("Failed to query \(key): \(error)")
 				}
 			}
-			
+
 			resourceValues = values
 		}
 		
 		@ViewBuilder var controls: some View {
 			if url.fileType?.isAudio == true {
-				Button(action: { play() }) {
-					Image(systemName: player?.isPlaying == true ? "pause.fill" : "play.fill")
+				Button(action: { audioPlayer.togglePlayback() }) {
+					Image(systemName: audioPlayer.isPlaying ? "pause.fill" : "play.fill")
 						.font(.system(size: 22))
 						.padding(10)
 				}
@@ -93,6 +151,9 @@ extension FileBrowserScreen.FileDetailsView {
 			.listStyle(.plain)
 			.task {
 				audioDuration = try? await url.audioDuration
+			}
+			.onDisappear {
+				audioPlayer.cleanup()
 			}
 		}
 	}

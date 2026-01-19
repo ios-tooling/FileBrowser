@@ -9,7 +9,7 @@ import SwiftUI
 extension FileBrowserScreen {
 	struct FileDetailsView: View {
 		let url: URL
-		enum Tab: String { case metadata, content }
+		enum Tab: String { case metadata, content, data }
 		@State var formatDetails: FileBrowserFileFormat?
 		
 		@AppStorage("file_viewer_tab") private var currentTab = Tab.metadata
@@ -27,8 +27,8 @@ extension FileBrowserScreen {
 
 					DataView(url: url)
 						.tabItem { Label("Data", systemImage: "doc.text.magnifyingglass") }
-						.tag(Tab.content)
-					
+						.tag(Tab.data)
+
 					if let formatter = fileBrowserViewFormatter(for: url.pathExtension), let formatDetails {
 						formatDetails.contentView
 							.tabItem { Label(formatter.name, systemImage: "eye") }
@@ -36,6 +36,7 @@ extension FileBrowserScreen {
 					}
 				}
 			}
+			.padding(.vertical, 4)
 			.navigationTitle(url.lastPathComponent)
 			.onAppear {
 				if let formatter = fileBrowserViewFormatter(for: url.pathExtension) {

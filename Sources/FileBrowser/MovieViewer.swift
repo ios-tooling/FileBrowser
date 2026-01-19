@@ -33,12 +33,11 @@ struct MovieViewer: UIViewControllerRepresentable {
 			self.url = url
 			self.player = AVPlayer(url: url)
 			self.controller = AVPlayerViewController()
-			
+
 			self.controller.player = player
 			self.controller.showsPlaybackControls = true
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				self.player.play()
-			}
+			// Note: Removed auto-play for better UX and accessibility
+			// Users can manually start playback using the built-in controls
 		}
 	}
 }
