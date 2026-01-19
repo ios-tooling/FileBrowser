@@ -11,16 +11,6 @@ import Suite
 import AVKit
 import CrossPlatformKit
 
-extension UTType {
-	var isMovie: Bool {
-		self == .movie || self == .mpeg4Movie || self == .quickTimeMovie
-	}
-	
-	var isImage: Bool {
-		self == .png || self == .jpeg || self == .gif || self == .image || self == .tiff
-	}
-}
-
 struct FileContentsView: View {
 	let url: URL
 	let fileType: UTType
@@ -96,20 +86,17 @@ struct FileContentsView: View {
 				// Load image asynchronously
 				// Note: UXImage (NSImage/UIImage) isn't Sendable in macOS 13, but we're
 				// not sharing it across actors - just loading on background and using on main
-				
-				if #available(macOS 14, *) {
-					let loadedImage: UXImage? = await Task.detached {
-						UXImage(contentsOf: url)
-					}.value
-					
-					guard let loadedImage else {
-						throw URLError(.cannotDecodeContentData)
-					}
-					
-					await MainActor.run {
-						self.image = loadedImage
-						self.isLoading = false
-					}
+				let loadedImage: UXImage? = await Task.detached {
+					UXImage(contentsOf: url)
+				}.value
+
+				guard let loadedImage else {
+					throw URLError(.cannotDecodeContentData)
+				}
+
+				await MainActor.run {
+					self.image = loadedImage
+					self.isLoading = false
 				}
 			} else {
 				// Load text content asynchronously

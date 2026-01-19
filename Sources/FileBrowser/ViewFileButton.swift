@@ -26,15 +26,3 @@ struct ViewFileButton: View {
 		}
 	}
 }
-
-extension UTType {
-	var isViewable: Bool {
-		// Only show "View" button for file types we can actually display
-		conforms(to: .image) ||
-		conforms(to: .movie) ||
-		conforms(to: .text) ||
-		conforms(to: .json) ||
-		conforms(to: .xml) ||
-		self == .data  // For hex viewer (DataView)
-	}
-}

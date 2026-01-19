@@ -178,9 +178,3 @@ extension FileBrowserScreen.FileDetailsView {
 		}
 	}
 }
-
-extension UTType {
-	var isAudio: Bool {
-		identifier.contains("audio")
-	}
-}
