@@ -85,6 +85,14 @@ extension FileBrowserScreen {
 			}
 		}
 		
+		var navigationTitle: String {
+			if let count = items?.count {
+				"\(directory.url.lastPathComponent) (\(count))"
+			} else {
+				directory.url.lastPathComponent
+			}
+		}
+		
 		var body: some View {
 			VStack(spacing: 0) {
 				if errors.isNotEmpty {
@@ -180,7 +188,7 @@ extension FileBrowserScreen {
 					}
 				}
 			}
-			.navigationTitle(directory.url.lastPathComponent)
+			.navigationTitle(navigationTitle)
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button(action: { dismissParent() }) {
