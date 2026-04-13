@@ -20,6 +20,9 @@ public struct FileBrowserDirectory: Identifiable, Equatable, Hashable, Sendable 
 		self.url = url
 		self.title = title ?? url.deletingPathExtension().lastPathComponent
 	}
+
+	public static func == (lhs: Self, rhs: Self) -> Bool { lhs.url == rhs.url }
+	public func hash(into hasher: inout Hasher) { hasher.combine(url) }
 }
 
 // Convenience extension for URL conversion

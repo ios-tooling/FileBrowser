@@ -6,6 +6,7 @@
 //
 
 import Suite
+import FileViewer
 import UniformTypeIdentifiers
 
 struct ViewFileButton: View {
@@ -20,7 +21,7 @@ struct ViewFileButton: View {
 					.padding(5)
 			}
 			.sheet(isPresented: $isViewing) {
-				FileContentsView(url: directory.url)
+				FileViewer(url: directory.url)
 					.frame(minWidth: 400, minHeight: 400)
 			}
 		}

@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "fileviewer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/FileViewer.git",
+      "state" : {
+        "revision" : "f18659c82aac8e02198c1c4b2bff20aa69b621a7",
+        "version" : "0.0.1"
+      }
+    },
+    {
       "identity" : "suite",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ios-tooling/Suite.git",

@@ -7,22 +7,10 @@
 
 import Foundation
 import SwiftUI
+import FileViewer
 
-public protocol FileBrowserFileFormat: AnyObject {
-	static var fileExtension: String { get }
-	static var name: String { get }
-
-	init(url: URL) throws
-	
-	var contentView: AnyView { get }
-}
-
-public var fileBrowserViewFormats: [FileBrowserFileFormat.Type] = []
+public typealias FileBrowserFileFormat = FileViewerFormat
 
 public func registerFileBrowserView(format: FileBrowserFileFormat.Type) {
-	fileBrowserViewFormats.append(format)
-}
-
-public func fileBrowserViewFormatter(for fileExtension: String) -> (any FileBrowserFileFormat.Type)? {
-	fileBrowserViewFormats.first { $0.fileExtension.lowercased() == fileExtension.lowercased() }
+	registerFileViewer(format: format)
 }
