@@ -4,7 +4,7 @@ A modern, SwiftUI-based file browser component for macOS, iOS, and watchOS.
 
 [![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/Platforms-macOS%2013+%20|%20iOS%2016+%20|%20watchOS%208+-blue.svg)](https://developer.apple.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](license.md)
 
 ## Features
 
@@ -375,7 +375,7 @@ Contributions are welcome! Please:
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details
+MIT License - see [LICENSE](license.md) for details
 
 ## Credits
 
